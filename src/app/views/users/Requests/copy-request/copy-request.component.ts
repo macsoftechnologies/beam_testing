@@ -60,10 +60,12 @@ export class CopyRequestComponent implements OnInit {
     Safety_Precautions: null,
     Special_Instructions: null,
     teamId:null,
-    createdTime: null
+    createdTime: null,
+    zone: null
   }
   Requestdata: any = {};
   userdata:any={};
+  zones: any = [];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<CopyRequestComponent>, 
@@ -76,6 +78,7 @@ export class CopyRequestComponent implements OnInit {
     this.minDate = new Date(config.getDenmarkTime.date());
     this.maxDate = new Date(currentYear + 1, 11, 31);
 this.userdata=this.jwtauthservice.getUser();
+this.zones = data.zones || [];
   }
 
   ngOnInit(): void {
@@ -120,7 +123,7 @@ this.userdata=this.jwtauthservice.getUser();
     this.CopyRequest.Number_Of_Workers = this.data["payload"]["Number_Of_Workers"];
     this.CopyRequest.PermitNo = this.data["payload"]["PermitNo"];
     this.CopyRequest.Power_Off_Required = this.data["payload"]["Power_Off_Required"];
-
+    this.CopyRequest.zone = this.zones
   }
 
   CreatenewRequest() {

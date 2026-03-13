@@ -1130,12 +1130,30 @@ this.SearchRequest.permit_type =
     } else {
       row['Request_status'] = 'Hold';
     }
+    const roomNosArray = row['Room_Nos']
+    ? row['Room_Nos'].split(',').map((r: string) => r.trim())
+    : [];
+
+  // Find the matching building by Building_Id
+  const buildingData = this.requestservice.bulidingDataWithIds();
+  const matchedBuilding = buildingData.find(
+    (b) => Number(b.buildingId) === Number(row['Building_Id'])
+  );
+
+  // Find floorNames where any zoneSubList value matches the Room_Nos values
+  const matchedZones = matchedBuilding?.zoneList
+    ?.filter((zone) =>
+      zone.zoneSubList.some((sub) => roomNosArray.includes(sub.value))
+    )
+    .map((zone) => zone.floorName) || [];
+
+  console.log('matched zone floor names:', matchedZones);
     let title = 'Copy Request';
     let dialogRef: MatDialogRef<any> = this.dialog.open(CopyRequestComponent, {
       width: '1200px',
       height: '300px',
       disableClose: false,
-      data: { title: title, payload: row, copyform: true },
+      data: { title: title, payload: row, copyform: true, zones: matchedZones },
     });
     dialogRef.afterClosed().subscribe((res) => {
       if (this.api == 'SearchRequest') {
