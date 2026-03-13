@@ -360,6 +360,10 @@ export class ListRequestComponent implements OnInit {
       Statusid: 'Pre-Approved',
       Statusname: 'Pre-Approved',
     },
+    {
+      Statusid: 'Auto-Cancel',
+      Statusname: 'Auto-Cancel',
+    },
   ];
   TypeS: any[] = [
     {
@@ -393,7 +397,11 @@ export class ListRequestComponent implements OnInit {
     hras: '',
     taskSpecificPPE: '',
     area: '',
-    permit_type: ''
+    permit_type: '',
+    permit_under: '',
+    night_shift: '',
+    new_date: "",
+    new_end_time: ""
   };
 
   RequestsbyidDto: RequestBySubcontractorId = {
@@ -407,6 +415,8 @@ export class ListRequestComponent implements OnInit {
   Buildings: Building[] = [];
   filteredFloors: string[] = [];
   filteredRooms: RoomGroup[] = [];
+  isnightshiftyes: boolean = false;
+  gridCols5: number = 5;
   
   private allRooms: RoomGroup[] = [];
   private allFloors: { buildingId: number; floorName: string }[] = [];
@@ -463,22 +473,26 @@ export class ListRequestComponent implements OnInit {
   !this.approvalUsers.includes('Admin')
 );
    
-    this.breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-      Breakpoints.Medium,
-      Breakpoints.Large,
-    ]).subscribe(result => {
-      if (result.breakpoints[Breakpoints.XSmall]) {
-        this.gridCols = 1; // Single column for extra small screens
-      } else if (result.breakpoints[Breakpoints.Small]) {
-        this.gridCols = 2; // Two columns for small screens
-      } else if (result.breakpoints[Breakpoints.Medium]) {
-        this.gridCols = 2; // Three columns for medium screens
-      } else if (result.breakpoints[Breakpoints.Large]) {
-        this.gridCols = 2; // Four columns for large screens
-      }
-    });
+this.breakpointObserver.observe([
+  Breakpoints.XSmall,
+  Breakpoints.Small,
+  Breakpoints.Medium,
+  Breakpoints.Large,
+]).subscribe(result => {
+  if (result.breakpoints[Breakpoints.XSmall]) {
+    this.gridCols = 1;
+    this.gridCols5 = 1;
+  } else if (result.breakpoints[Breakpoints.Small]) {
+    this.gridCols = 2;
+    this.gridCols5 = 2;
+  } else if (result.breakpoints[Breakpoints.Medium]) {
+    this.gridCols = 2;
+    this.gridCols5 = 3;
+  } else if (result.breakpoints[Breakpoints.Large]) {
+    this.gridCols = 2;
+    this.gridCols5 = 5;
+  }
+});
 
     let testing = [1,2,3]
 
@@ -524,6 +538,12 @@ export class ListRequestComponent implements OnInit {
       TaskSpecific:['',],
       area: ['',],
       permit_type: ['',],
+      permit_under: ['',],
+      StartTime: ['',],
+      EndTime: ['',],
+      night_shift: ['',],
+      newWorkDate: ['',],
+      new_end_time: ['',],
     });
     this.initializeData();
     this.setupFilterListeners();
@@ -745,6 +765,37 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
     });
   }
 
+      toggleNightShift(isChecked: boolean) {
+    this.isnightshiftyes = isChecked;
+    this.RequestlistForm.get('night_shift').setValue(isChecked ? 1 : 0);
+  
+    const newEndTimeControl = this.RequestlistForm.get('new_end_time');
+    const newWorkDateControl = this.RequestlistForm.get('newWorkDate');
+  
+    if (isChecked) {
+      const startDateValue = this.RequestlistForm.get('Startdate').value;
+      if (startDateValue) {
+        const startDate = new Date(startDateValue);
+        const newWorkDate = new Date(startDate);
+        newWorkDate.setDate(startDate.getDate() + 1);
+        const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
+        newWorkDateControl.setValue(formattedDate);
+      }
+      // Add required validators when night shift is YES
+      newEndTimeControl.setValidators([Validators.required]);
+      newWorkDateControl.setValidators([Validators.required]);
+    } else {
+      // Clear values and validators when night shift is NO
+      newEndTimeControl.reset();
+      newWorkDateControl.reset();
+      newEndTimeControl.clearValidators();
+      newWorkDateControl.clearValidators();
+    }
+  
+    // Re-evaluate validity after validator change
+    newEndTimeControl.updateValueAndValidity();
+    newWorkDateControl.updateValueAndValidity();
+  }
 
   getItems() {
     //this.items = this.userservices.RequestLists;
@@ -1257,6 +1308,10 @@ this.SearchRequest.permit_type =
       taskSpecificPPE: '',
       area: formattedArea,
       permit_type: '',
+      permit_under: '',
+      night_shift: '',
+      new_date: '',
+      new_end_time: ''
     };
 
     this.requestservice.SearchRequest(searchCheckRequest).subscribe((res) => {
@@ -1357,6 +1412,7 @@ proceedWithStatusChange(row) {
     );
     
     dialogRef.afterClosed().subscribe((res) => {
+      if (res === true) { 
       if (this.api == 'SearchRequest') {
         console.log("search API");
         const mainValue = this.currentPage - 1;
@@ -1371,6 +1427,7 @@ proceedWithStatusChange(row) {
         console.log("NUMMBER", this.currentPage)
         console.log("Start Value", this.startValue)
       }
+    }
     });
   }
 }
@@ -1398,6 +1455,7 @@ proceedWithStatusChange(row) {
           }
         );
         dialogRef.afterClosed().subscribe((res) => {
+          if (res === true) { 
           if (this.api == 'SearchRequest') {
             console.log("search API");
             // this.api = 'SearchRequest';
@@ -1416,6 +1474,7 @@ proceedWithStatusChange(row) {
             console.log("NUMMBER", this.currentPage)
             console.log("Start Value", this.startValue)
           }
+        }
         });
       }
     } else if (status == 'Closed') {
@@ -1624,6 +1683,10 @@ proceedWithStatusChange(row) {
             taskSpecificPPE: '',
             area: formattedArea,
             permit_type: '',
+            permit_under: '',
+            night_shift: '',
+            new_date: '',
+            new_end_time: ''
         };
 
         return this.requestservice.SearchRequest(searchCheckRequest).pipe(

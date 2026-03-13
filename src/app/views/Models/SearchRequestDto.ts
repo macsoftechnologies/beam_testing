@@ -17,6 +17,10 @@ export class SearchRequestDto
     taskSpecificPPE: string;
     area: string;
     permit_type: string;
+    permit_under: string;
+    night_shift: string;
+    new_date: string;
+    new_end_time: string;
 }
 
 export class ListRequest
