@@ -465,6 +465,7 @@ export class CopyRequestDto {
     teamId: string;
     count: number;
     createdTime: any;
+    zone: any;
 }
 
 export class UpdateClose_Status {
