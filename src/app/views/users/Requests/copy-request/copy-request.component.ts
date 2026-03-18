@@ -144,11 +144,20 @@ this.userdata=this.jwtauthservice.getUser();
 if(this.CopyRequest.Assign_Start_Date == '' || this.CopyRequest.Assign_End_Date == '') {
       this.openSnackBar('Please provide proper dates to copy');
     } else {
-    this.reqservice.CopyRequest(this.CopyRequest).subscribe(res=>
-      {
-        this.openSnackBar('Request Created Successfully');
-        // window.location.reload();
-      }); 
+    // this.reqservice.CopyRequest(this.CopyRequest).subscribe(res=>
+    //   {
+    //     this.openSnackBar('Request Created Successfully');
+    //     // window.location.reload();
+    //   });
+    this.reqservice.CopyRequest(this.CopyRequest).subscribe(res => {
+  if (res.status === 400) {
+    this.openSnackBar(res.message || 'Bad Request');
+  } else {
+    this.openSnackBar('Request Created Successfully');
+  }
+}, err => {
+  this.openSnackBar('Something went wrong');
+});
   }
 }
 
