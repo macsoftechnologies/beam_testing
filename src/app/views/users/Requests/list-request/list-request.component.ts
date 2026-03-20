@@ -1284,6 +1284,9 @@ this.SearchRequest.permit_type =
 }
 
 proceedWithStatusChange(row) {
+  row.permit_type = row.permit_type ?? '';
+  row.permit_under = row.permit_under ?? '';
+  console.log("approvalcheck", this.firstApproval, this.secondApproval, this.bothApproval);
     let title = 'Request Status Change ';
     let type;
     if ((this.firstApproval || this.bothApproval) && row.Request_status == 'Hold' && (
@@ -1292,6 +1295,8 @@ proceedWithStatusChange(row) {
       (row.permit_type == 'Construction' && row.permit_under=='Construction') || 
       (row.permit_type == 'Commissioning' && row.permit_under=='Commissioning') ||
       (row.permit_type == '' && row.permit_under=='') ||
+      (row.permit_type == '' && row.permit_under=='Construction') ||
+      (row.permit_type == '' && row.permit_under=='Commissioning') ||
       (row.permit_type == 'Commissioning' && row.permit_under=='') ||
       (row.permit_type == 'Construction' && row.permit_under=='')
     )) {
@@ -1302,6 +1307,8 @@ proceedWithStatusChange(row) {
       (row.permit_type == 'Construction' && row.permit_under=='Construction') || 
       (row.permit_type == 'Commissioning' && row.permit_under=='Commissioning') ||
       (row.permit_type == '' && row.permit_under=='') ||
+      (row.permit_type == '' && row.permit_under=='Construction') ||
+      (row.permit_type == '' && row.permit_under=='Commissioning') ||
       (row.permit_type == 'Commissioning' && row.permit_under=='') ||
       (row.permit_type == 'Construction' && row.permit_under==''))) {
       type = 'operartor';
@@ -1311,6 +1318,8 @@ proceedWithStatusChange(row) {
       (row.permit_type == 'Construction' && row.permit_under=='Construction') || 
       (row.permit_type == 'Commissioning' && row.permit_under=='Commissioning') ||
       (row.permit_type == '' && row.permit_under=='') ||
+      (row.permit_type == '' && row.permit_under=='Construction') ||
+      (row.permit_type == '' && row.permit_under=='Commissioning') ||
       (row.permit_type == 'Commissioning' && row.permit_under=='') ||
       (row.permit_type == 'Construction' && row.permit_under==''))) {
       type = 'operartor';
@@ -1326,16 +1335,16 @@ proceedWithStatusChange(row) {
     //   }
     // }
 
-    if(!this.firstApproval && this.secondApproval && row.permit_under == 'Construction' && row.permit_type == 'Commissioning' && row.Request_status == 'Pre-Approved') {
+    if(!this.firstApproval && this.secondApproval && (row.permit_under == 'Construction' || row.permit_under == '') && row.permit_type == 'Commissioning' && row.Request_status == 'Pre-Approved') {
       return this.openSnackBar("Can't have access to final approval. Please ask COMM person to approve it.");
     }
-    if(!this.firstApproval && this.secondApproval && row.permit_under == 'Commissioning' && row.permit_type == 'Construction' && row.Request_status == 'Hold') {
+    if(!this.firstApproval && this.secondApproval && row.permit_under == 'Commissioning' && (row.permit_type == 'Construction' || row.permit_type == '') && row.Request_status == 'Hold') {
       return this.openSnackBar("Can't have access to initial approval. Please ask CONM person to approve it.");
     }
-    if(this.firstApproval && !this.secondApproval && row.permit_under == 'Commissioning' && row.permit_type == 'Construction' && row.Request_status == 'Pre-Approved') {
+    if(this.firstApproval && !this.secondApproval && row.permit_under == 'Commissioning' && (row.permit_type == 'Construction' || row.permit_type == '') && row.Request_status == 'Pre-Approved') {
       return this.openSnackBar("Can't have access to final approval. Please ask CONM person to pre-approve it.");
     } 
-    if(this.firstApproval && !this.secondApproval && row.permit_under == 'Construction' && row.permit_type == 'Commissioning' && row.Request_status == 'Hold') {
+    if(this.firstApproval && !this.secondApproval && (row.permit_under == 'Construction' || row.permit_under == '') && row.permit_type == 'Commissioning' && row.Request_status == 'Hold') {
       return this.openSnackBar("Can't have access to initial approval. Please ask C&Q person to pre-approve it.");
     } 
     else {
