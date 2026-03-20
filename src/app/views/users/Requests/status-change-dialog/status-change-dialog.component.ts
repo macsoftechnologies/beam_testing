@@ -1,6 +1,5 @@
 
-import { Component, OnInit, Inject, ChangeDetectorRef } from "@angular/core";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, ElementRef, NgZone } from "@angular/core";
 import {
   EditRequestDto,
   UpdateClose_Status,
@@ -11,6 +10,7 @@ import { JwtAuthService } from "app/shared/services/auth/jwt-auth.service";
 import { config } from "config";
 import * as moment from 'moment';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 // import { AuditLoggerService } from "app/shared/services/audit-logger.service";
 
 @Component({
@@ -269,9 +269,12 @@ export class StatusChangeDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private requestdataservice: RequestService,
+    private dialogRef: MatDialogRef<StatusChangeDialogComponent>,
     private _snackBar: MatSnackBar,
     private authservice: JwtAuthService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+  private el: ElementRef,
+  private zone: NgZone
     // private auditLogger: AuditLoggerService
   ) {
     this.userdata = this.authservice.getUser();
@@ -586,6 +589,90 @@ export class StatusChangeDialogComponent implements OnInit {
     this.cd.detectChanges();
     console.log('permit under', this.permitUnder);
     console.log("permit type", this.permitType);
+    // Add at the end of ngOnInit(), after this.cd.detectChanges()
+setTimeout(() => {
+  const dialogContainer = this.el.nativeElement.closest('mat-dialog-container') 
+    || this.el.nativeElement.parentElement;
+  
+  if (dialogContainer) {
+    dialogContainer.addEventListener('keydown', (event: KeyboardEvent) => {
+      this.zone.run(() => {
+        if (event.key !== 'Enter') return;
+        
+        const activeTag = (document.activeElement as HTMLElement)?.tagName?.toUpperCase();
+        if (activeTag === 'BUTTON' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        console.log('Enter pressed - type:', this.type, 'requestDatas:', this.requestDatas, 
+                    'permitType:', this.permitType, 'permitUnder:', this.permitUnder);
+
+        if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
+            this.permitType === 'Commissioning' && this.permitUnder === 'Construction') {
+          const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
+          console.log('CoMM_initials val:', val);
+          if (val) this.Changestatus('Pre-Approved');
+          return;
+        }
+
+        if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
+            this.permitType === 'Construction' && this.permitUnder === 'Commissioning') {
+          const val = this.statusApprovedForm.get('ConM_initials').value?.trim();
+          if (val) this.Changestatus('Pre-Approved');
+          return;
+        }
+
+        if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
+            this.permitType === 'Commissioning' && this.permitUnder === 'Commissioning') {
+          const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
+          if (val) this.Changestatus('Approved');
+          return;
+        }
+
+        if (this.type === 'operartor' && this.requestDatas === 'Pre-Approved' &&
+            this.permitType === 'Construction' && this.permitUnder === 'Commissioning') {
+          const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
+          if (val) this.Changestatus('Approved');
+          return;
+        }
+
+        if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
+            this.permitType === 'Construction' && this.permitUnder === 'Construction') {
+          const val = this.statusApprovedForm.get('ConM_initials').value?.trim();
+          if (val) this.Changestatus('Approved');
+          return;
+        }
+
+        if (this.type === 'operartor' && this.requestDatas === 'Pre-Approved' &&
+            this.permitType === 'Commissioning' && this.permitUnder === 'Construction') {
+          const val = this.statusApprovedForm.get('ConM_initials').value?.trim();
+          if (val) this.Changestatus('Approved');
+          return;
+        }
+
+        if (this.type === 'Opened' && !this.isclose) {
+          if (this.canOpen()) this.ChangestatusToOpen('Opened');
+          return;
+        }
+
+        if (this.type === 'Closed') {
+          const closeNote = this.statusUpdateForm.get('close_note').value?.trim();
+          const hotworkValid =
+            this.updaterequestdata.Hot_work !== 1 ||
+            (this.statusUpdateForm.get('h_heat_source').valid &&
+              this.statusUpdateForm.get('h_workplace_check').valid &&
+              this.statusUpdateForm.get('h_fire_detectors').valid &&
+              this.statusUpdateForm.get('h_start_time').valid &&
+              this.statusUpdateForm.get('h_end_time').valid);
+
+          if (closeNote && hotworkValid) this.Changestatusbysubcontractor1('Closed');
+          return;
+        }
+      });
+    });
+  }
+}, 100);
   }
   onLowRiskChange() {
   if (this.statusOpenForm.get('low_risk_hotwork').value == 1) {
@@ -695,20 +782,33 @@ canOpen() {
         formData.append(key, value); // Ensure values are strings if needed
       }
 
-      this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
-        (x) => {
-          if (x.status == 200) {
-            this.openSnackBar("Request Status Updated Successfully");
-            // console.log("TEST", this.data.pagedatainfo.Start, this.data.pagedatainfo.Page)
-            window.location.reload();
-            this.ngOnInit();
-          }
-        },
-        (error) => {
-          this.openSnackBar("Something went wrong. Plz try again later...");
-        }
+ this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
+  (x) => {
+    if (x['success'] == true) {
+      this.openSnackBar("Request Status Updated Successfully");
+      this.dialogRef.close(true);
+    }
+  },
+  (error) => {
+    this.openSnackBar("Something went wrong. Plz try again later...");
+  }
+);
 
-      );
+      // this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
+      //   (x) => {
+      //     if (x.status == 200) {
+      //       this.openSnackBar("Request Status Updated Successfully");
+      //       // console.log("TEST", this.data.pagedatainfo.Start, this.data.pagedatainfo.Page)
+      //       // window.location.reload();
+      //       this.dialogRef.close(true);
+      //       // this.ngOnInit();
+      //     }
+      //   },
+      //   (error) => {
+      //     this.openSnackBar("Something went wrong. Plz try again later...");
+      //   }
+
+      // );
 
     }
   }
@@ -778,19 +878,32 @@ canOpen() {
       }
 
       this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
-        (x) => {
-          if (x.status == 200) {
-            this.openSnackBar("Request Status Updated Successfully");
-            // console.log("TEST", this.data.pagedatainfo.Start, this.data.pagedatainfo.Page)
-            window.location.reload();
-            this.ngOnInit();
-          }
-        },
-        (error) => {
-          this.openSnackBar("Something went wrong. Plz try again later...");
-        }
+  (x) => {
+    if (x['success'] == true) {
+      this.openSnackBar("Request Status Updated Successfully");
+      this.dialogRef.close(true);
+    }
+  },
+  (error) => {
+    this.openSnackBar("Something went wrong. Plz try again later...");
+  }
+);
 
-      );
+      // this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
+      //   (x) => {
+      //     if (x.status == 200) {
+      //       this.openSnackBar("Request Status Updated Successfully");
+      //       // console.log("TEST", this.data.pagedatainfo.Start, this.data.pagedatainfo.Page)
+      //       // window.location.reload();
+      //       this.dialogRef.close(true);
+      //       // this.ngOnInit();
+      //     }
+      //   },
+      //   (error) => {
+      //     this.openSnackBar("Something went wrong. Plz try again later...");
+      //   }
+
+      // );
 
     }
   }
@@ -843,19 +956,33 @@ canOpen() {
     console.log(this.statusUpdateForm, "form")
 
     this.requestdataservice.CloseRequest(formData).subscribe(
-      (res) => {
-        if (res.status == 200) {
-          this.openSnackBar("Request Status Updated Successfully");
-          this.spinner = false;
-          // window.location.reload();
-          this.ngOnInit();
-        }
-      },
-      (error) => {
-        this.spinner = false;
-        this.openSnackBar("Something went wrong. Plz try again later...");
-      }
-    );
+  (res) => {
+    if (res['success'] == true) {
+      this.openSnackBar("Request Status Updated Successfully");
+      this.spinner = false;
+      this.dialogRef.close(true);
+    }
+  },
+  (error) => {
+    this.spinner = false;
+    this.openSnackBar("Something went wrong. Plz try again later...");
+  }
+);
+
+    // this.requestdataservice.CloseRequest(formData).subscribe(
+    //   (res) => {
+    //     if (res.status == 200) {
+    //       this.openSnackBar("Request Status Updated Successfully");
+    //       this.spinner = false;
+    //       // window.location.reload();
+    //       this.ngOnInit();
+    //     }
+    //   },
+    //   (error) => {
+    //     this.spinner = false;
+    //     this.openSnackBar("Something went wrong. Plz try again later...");
+    //   }
+    // );
   }
 
   Changestatusbysubcontractor1(status) {
@@ -905,19 +1032,34 @@ canOpen() {
     console.log(this.statusUpdateForm, "form")
 
     this.requestdataservice.CloseRequest(formData).subscribe(
-      (res) => {
-        if (res.status == 200) {
-          this.openSnackBar("Request Status Updated Successfully");
-          this.spinner = false;
-          // window.location.reload();
-          this.ngOnInit();
-        }
-      },
-      (error) => {
-        this.spinner = false;
-        this.openSnackBar("Something went wrong. Plz try again later...");
-      }
-    );
+  (res) => {
+    if (res['status'] == 200) {
+      this.openSnackBar("Request Status Updated Successfully");
+      this.spinner = false;
+      this.dialogRef.close(true);
+    }
+  },
+  (error) => {
+    this.spinner = false;
+    this.openSnackBar("Something went wrong. Plz try again later...");
+  }
+);
+
+    // this.requestdataservice.CloseRequest(formData).subscribe(
+    //   (res) => {
+    //     if (res.status == 200) {
+    //       this.openSnackBar("Request Status Updated Successfully");
+    //       this.spinner = false;
+    //       // window.location.reload();
+    //       this.dialogRef.close(true);
+    //       // this.ngOnInit();
+    //     }
+    //   },
+    //   (error) => {
+    //     this.spinner = false;
+    //     this.openSnackBar("Something went wrong. Plz try again later...");
+    //   }
+    // );
   }
 
 

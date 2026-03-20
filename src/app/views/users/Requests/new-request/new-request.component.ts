@@ -2083,7 +2083,7 @@ onMechanicalSearch(val: string) {
   }
   const lowerVal = val.toLowerCase();
   this.filteredMechanicalList = this.mechanicalList.filter(e =>
-    e.mechanical_works.toLowerwCase().includes(lowerVal)
+    e.mechanical_works.toLowerCase().includes(lowerVal)
   );
 }
 
@@ -4407,6 +4407,8 @@ private logFieldChanges(previousData: any, currentData: any): any[] {
 
       if(this.isstatusdraft) {
         this.updaterequestdata.fields = "";
+        let currentdate = config.getDenmarkTime.date();
+        this.updaterequestdata.Request_Date = currentdate;
       }
 
       let formData = new FormData();

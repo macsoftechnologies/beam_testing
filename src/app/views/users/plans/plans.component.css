@@ -1,7 +1,8 @@
 .mat-form-field
   {
     width: 100%;
-    padding-right: 70px; 
+    padding-right: 4px; 
+    margin-left: 4px;
   }
   h3{
     padding: 30px;
@@ -26,7 +27,15 @@
    
 }
 .card-content{
-  margin: 30px;
+  margin: 0px;
+}
+.hras-image{
+    width: 20px!important;
+    margin-right: 5px;
+}
+.hras-content{
+    display: flex!important;
+    align-items: center!important;
 }
 /* .download_btn_sty
 {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup } from '@angular/forms';
+import {FormBuilder, FormGroup, Validators, } from '@angular/forms';
 import { UserService } from 'app/shared/services/user.service';
 import { Router } from '@angular/router';
 import { PrintDownloadOptions } from 'app/views/Models/PrintDownloadOptionsDto';
@@ -70,6 +70,121 @@ export class PlansComponent implements OnInit {
     },
   ];
 
+    Status: any[] = [
+    {
+      Statusid: 'Hold',
+      Statusname: 'Hold',
+    },
+    {
+      Statusid: 'Draft',
+      Statusname: 'Draft',
+    },
+    {
+      Statusid: 'Approved',
+      Statusname: 'Approved',
+    },
+    {
+      Statusid: 'Rejected',
+      Statusname: 'Rejected',
+    },
+    {
+      Statusid: 'Opened',
+      Statusname: 'Opened',
+    },
+    {
+      Statusid: 'Closed',
+      Statusname: 'Closed',
+    },
+    {
+      Statusid: 'Cancelled',
+      Statusname: 'Cancelled',
+    },
+    {
+      Statusid: 'Pre-Approved',
+      Statusname: 'Pre-Approved',
+    },
+    {
+      Statusid: 'Auto-Cancel',
+      Statusname: 'Auto-Cancel',
+    },
+  ];
+
+    getHras = [
+    {
+      "label": "Hotwork",
+      "value": 1,
+      "key": "Hot_work",
+      "image": "assets/images/logos/HotWorks.png"
+    },
+    {
+      "label": "Electrical Systems",
+      "value": 1,
+      "key": "working_on_electrical_system",
+       "image": "assets/images/logos/ElectricalSystems.png"
+    },
+    {
+      "label": "Hazardous Substances/Chemicals",
+      "value": 1,
+      "key": "working_hazardious_substen",
+      "image": "assets/images/logos/substanceChemical.png"
+    },
+    {
+      "label": "Pressure testing of equipment",
+      "value": 1,
+      "key": "pressure_tesing_of_equipment",
+      "image": "assets/images/logos/testingequipment.png"
+    },
+    {
+      "label": "Working At Height",
+      "value": 1,
+      "key": "working_at_height",
+      "image": "assets/images/logos/WorkingAtHight.png"
+    },
+    {
+      "label": "Confined Spaces",
+      "value": 1,
+      "key": "working_confined_spaces",
+      "image": "assets/images/logos/ConfinedSpace.png"
+    },
+    // {
+    //   "label": "Working in ATEX Area",
+    //   "value": 1,
+    //   "key": "work_in_atex_area",
+    //   "image": "assets/images/logos/ATEXarea.png"
+    // },
+    // {
+    //   "label": "Securing Facilities (LOTO)",
+    //   "value": 1,
+    //   "key":"securing_facilities",
+    //   "image": "assets/images/logos/SecuringFacilities.png"
+    // },
+    {
+      "label": "Excavation Works",
+      "value": 1,
+      "key": "excavation_works",
+      "image": "assets/images/logos/ExcavationWorks.png"
+    },
+    {
+      "label": "Using Crane or Lifting",
+      "value": 1,
+      "key": "using_cranes_or_lifting",
+      "image": "assets/images/logos/Craneslifting.png"
+    },
+    {
+      "label": "Energization of Electrical Equipment",
+      "value": 1,
+      "key": "power_on",
+      "image": "assets/images/logos/electrical_works.png"
+    },
+    {
+      "label": "Energization of Mechanical Equipment",
+      "value": 1,
+      "key": "pressurization",
+      "image": "assets/images/logos/mechanical1.png"
+    },
+    
+  ];
+
   SubContractors: any[] = [];
   Sites: any[] = [];
   Weeks: any[] = [];
@@ -126,7 +241,13 @@ export class PlansComponent implements OnInit {
     start_time: null,
     end_time: null,
     area: null,
-    permit_type: null
+    permit_type: null,
+    night_shift: null,
+    new_date: null,
+    new_end_time: null,
+    permit_under: null,
+    hras: '',
+    Request_status: null,
   }
   Planslist: any[] = [];
   dataForExcel = [];
@@ -142,6 +263,8 @@ export class PlansComponent implements OnInit {
   private allRooms: RoomGroup[] = [];
   private allFloors: { buildingId: number; floorName: string }[] = [];
   gridCols = 2;
+  gridCols5: number = 5;
+  isnightshiftyes: boolean = false;
 
   constructor(private fb: FormBuilder, private userservices: UserService,
     private route: Router,public ete: ExportExcelService,
@@ -174,10 +297,26 @@ export class PlansComponent implements OnInit {
   // getRooms: string[] = [];
 
   ngOnInit(): void {
-    this.breakpointObserver.observe(['(max-width: 599px)']) // 👈 custom mobile-only query
-      .subscribe(result => {
-        this.gridCols = result.matches ? 1 : 2;
-      });
+   this.breakpointObserver.observe([
+     Breakpoints.XSmall,
+     Breakpoints.Small,
+     Breakpoints.Medium,
+     Breakpoints.Large,
+   ]).subscribe(result => {
+     if (result.breakpoints[Breakpoints.XSmall]) {
+       this.gridCols = 1;
+       this.gridCols5 = 1;
+     } else if (result.breakpoints[Breakpoints.Small]) {
+       this.gridCols = 2;
+       this.gridCols5 = 2;
+     } else if (result.breakpoints[Breakpoints.Medium]) {
+       this.gridCols = 2;
+       this.gridCols5 = 3;
+     } else if (result.breakpoints[Breakpoints.Large]) {
+       this.gridCols = 2;
+       this.gridCols5 = 5;
+     }
+   });
     this.PlanForm = this.fb.group({
       Date: [''],
       Year: [''],
@@ -194,6 +333,10 @@ export class PlansComponent implements OnInit {
       EndTime: [''],
       area: [''],
       permit_type: ['',],
+      permit_under: ['',],
+      night_shift: ['',],
+      newWorkDate: ['',],
+      new_end_time: ['',],
     });
 
     this.initializeData();
@@ -293,6 +436,45 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
     });
     return rooms;
   }
+
+    formatDateWithoutTimezone(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+        toggleNightShift(isChecked: boolean) {
+      this.isnightshiftyes = isChecked;
+      this.PlanForm.get('night_shift').setValue(isChecked ? 1 : 0);
+    
+      const newEndTimeControl = this.PlanForm.get('new_end_time');
+      const newWorkDateControl = this.PlanForm.get('newWorkDate');
+    
+      if (isChecked) {
+        const startDateValue = this.PlanForm.get('Startdate').value;
+        if (startDateValue) {
+          const startDate = new Date(startDateValue);
+          const newWorkDate = new Date(startDate);
+          newWorkDate.setDate(startDate.getDate() + 1);
+          const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
+          newWorkDateControl.setValue(formattedDate);
+        }
+        // Add required validators when night shift is YES
+        newEndTimeControl.setValidators([Validators.required]);
+        newWorkDateControl.setValidators([Validators.required]);
+      } else {
+        // Clear values and validators when night shift is NO
+        newEndTimeControl.reset();
+        newWorkDateControl.reset();
+        newEndTimeControl.clearValidators();
+        newWorkDateControl.clearValidators();
+      }
+    
+      // Re-evaluate validity after validator change
+      newEndTimeControl.updateValueAndValidity();
+      newWorkDateControl.updateValueAndValidity();
+    }
 
   Getselectedyear(event) {
     this.ListWeeks.length = 0;
@@ -505,179 +687,6 @@ Getplans() {
     });
   }
 
-//   exportToExcel() {
-
-// // let base64_Img:any;
-
-// // let workbook: ExcelProper.Workbook = new Excel.Workbook();
-
-// // let worksheet = workbook.addWorksheet('Sales Data');
-
-// //     worksheet.mergeCells('A1', 'M1');
-// //     let titleRow = worksheet.getCell('C1');
-// //     titleRow.value = "ACTIVITY PERMITS WEEK 20"
-// //     titleRow.font = {
-// //       name: 'Calibri',
-// //       size: 16,
-// //       underline: 'single',
-// //       bold: true,
-// //       color: { argb: '0085A3' }
-// //     }
-// //     titleRow.alignment = { vertical: 'middle', horizontal: 'center' }
-
-
-
-// //     this.http.get('/assets/images/logo-beam.png', { responseType: 'blob' })
-// //       .subscribe(res => {
-// //         const reader = new FileReader();
-// //         reader.onloadend = () => {
-// //            base64_Img = reader.result;                
-           
-// //         }
-
-// //         reader.readAsDataURL(res); 
-// //         console.log(res);
-// //       });
-//   //     let myLogoImage = workbook.addImage({
-      
-//   //       base64: base64_Img,
-//   //       extension: 'png',
-//   //     });
-//   // //  worksheet.mergeCells('A1:B4');
-//   //   worksheet.addImage(myLogoImage, 'A1:B4');
-
-//     // let headerRow = worksheet.addRow(this.Cols);
-//     // headerRow.eachCell((cell, number) => {
-//     //   cell.fill = {
-//     //     type: 'pattern',
-//     //     pattern: 'solid',
-//     //     fgColor: { argb: '4167B8' },
-//     //     bgColor: { argb: '' }
-//     //   }
-//     //   cell.font = {
-//     //     bold: true,
-//     //     color: { argb: 'FFFFFF' },
-//     //     size: 12
-//     //   }
-//     // });
-
-    
-
-//     this.Planslist.forEach(x=>
-//       {
-//         var day=new Date(x["Working_Date"]).getDay()
-//         console.log(this.days_Names[day]);
-//         this.DownloadExcelData.push(
-//           {Company_Name:x["Company_Name"],subContractorName:x["subContractorName"],Site_Id:x["Site_Id"],
-//           Building_Id:x["Building_Id"],Activity:x["Activity"],PermitNo:x["PermitNo"],
-//           Start_Time:x["Start_Time"],End_Time:x["End_Time"],Request_status:x["Request_status"],
-//           Notes:x["Notes"],Working_Date:x["Working_Date"],Day:this.days_Names[day]}
-//         )
-//       });
-
-
-//       // this.DownloadExcelData.forEach(d => {
-//       //    worksheet.addRow(d);
-//       // });
-  
-//       // workbook.xlsx.writeBuffer().then((data) => {
-//       //   let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-//       //   fs.saveAs(blob, "ACTIVITY PERMITS WEEK 20" + '.csv');
-//       // })
-
-//       // workbook.xlsx.writeBuffer().then( data => {
-//       //   const blob = new Blob( [data], {type: "application/octet-stream"} );
-//       //   saveAs( blob, 'ACTIVITY_PERMITS_WEEK_20.xlsx');
-//       // });
-
-//     const rowsString: string[] = [];
-//     let headerString = '';
-//     let csv = '';
-
-//     this.ModalOptions = {
-//       key: '',
-//       fileName: '',
-//       dialogHeader: '',
-//       dialogMessage: '',
-//       enableDownloadExcel: true,
-//       enablePrint: true,
-//       dataSource: '',
-//       tableData: '',
-//       columns: this.Cols,
-//       reportHeaderColumns: '',
-//       reportFooterColumns: ''
-
-//     };
-
-//     this.ModalOptions.tableData =  this.DownloadExcelData;
-
-//     this.ModalOptions.fileName = "test" + "_" + moment(new Date()).format('YYYY/MM/DD').toString();
-
-//     for (const column of this.ModalOptions.columns) {
-//       let data = column.header;
-//       data = data === 'undefined' ? '' : data;
-//       data = data === null ? '' : data;
-//       data = data === 'null' ? '' : data;
-//       headerString += data + ',';
-
-//     }
-//     csv += headerString + '\n';
-
-//     for (let i = 0; i < this.ModalOptions.tableData.length; i++) {
-//       let rowString = '';
-//       let colNames = '';
-//       let objValues = {};
-//       let val = '';
-
-//       const tableRow = this.ModalOptions.tableData[i];
-//       for (const column of this.ModalOptions.columns) {
-//         if (column.field.includes('.')) {
-//           colNames = column.field.split('.');
-//           objValues = tableRow[colNames[0]];
-//           val = String(objValues[colNames[1]])
-//             .replace(/[\n\r]+/g, '')
-//             .replace(/\s{2,}/g, ' ')
-//             .replace(/,/g, '')
-//             .trim();
-//           val = val === 'true' ? '1' : val === 'false' ? '0' : val;
-//           val = val === null ? '' : val;
-//           val = val === 'null' ? '' : val;
-//           val = val === '0' ? '' : val;
-//           val = val === 'undefined' ? '' : val;
-//           rowString += val + ',';
-//         } else {
-//           val = String(tableRow[column.field])
-//             .replace(/[\n\r]+/g, '')
-//             .replace(/\s{2,}/g, ' ')
-//             .replace(/,/g, '')
-//             .trim();
-//           val = val === 'true' ? '1' : val === 'false' ? '0' : val;
-//           val = val === null ? '' : val;
-//           val = val === 'null' ? '' : val;
-//           val = val === '0' ? '' : val;
-//           val = val === 'undefined' ? '' : val;
-//           rowString += val + ',';
-//         }
-//       }
-//       rowsString.push(rowString);
-//     }
-
-//     for (const row of rowsString) {
-//       csv += row + '\n';
-//     }
-
-//     csv += this.ModalOptions.reportFooterColumns + '\n';
-//     const blob = new Blob(['\uFEFF', csv], { type: 'text/csv' });
-//     const link = document.createElement('a');
-//     link.setAttribute('href', window.URL.createObjectURL(blob));
-//     link.setAttribute(
-//       'download',
-//       this.ModalOptions.fileName + this.ModalOptions.key + '.csv'
-//     );
-//     document.body.appendChild(link); // Required for FF
-//     link.click();
-//   }
-
 isValidDate(date: any): boolean {
   if (!date) return false;
 
@@ -693,8 +702,6 @@ isValidDate(date: any): boolean {
   return false;
 }
 
-
-
   exportToExcel() {
     this.DownloadExcelData.length=0;
     this.DownloadExcelData=[];
@@ -705,19 +712,13 @@ isValidDate(date: any): boolean {
         var day=new Date(x["Working_Date"]).getDay();
         if(!x["permit_type"]) {
           x["permit_type"] = "Construction";
-        } 
-        // this.DownloadExcelData.push(
-        //   {Company_Name:x["Company_Name"],subContractorName:x["subContractorName"],Level:x["Room_Type"],
-        //   Building_Name:x["building_name"],Activity:x["Activity"],PermitNo:x["PermitNo"],
-        //   Start_Time:x["Start_Time"],End_Time:x["End_Time"],Request_status:x["Request_status"],
-        //   Notes:x["Notes"],Working_Date:x["Working_Date"],Day:this.days_Names[day]}
-        // )
+        }
         this.DownloadExcelData.push(
           {
             PermitNo: x["PermitNo"], PermitUnder: x["permit_under"] || 'Construction', PermitType:x["permit_type"] || 'Construction', ContractorName: x["subContractorName"], Sub_Contractor_Name: x['new_sub_contractor'], Building_Name: x["building_name"], Level: x["Room_Type"],
             Room_Nos: x['Room_Nos'], Activity: x["Activity"],description_of_activity: x["description_of_activity"], Rams_Number: x["rams_number"],HRAs: this.printHRAS(x),Auth:x[""],Comment: x[""],
             Start_Time: x["Start_Time"], End_Time: x["End_Time"], Night_Shift: this.nightShiftCheck(x), New_End_Time: x["new_end_time"], Request_status: x["Request_status"],
-            Notes: this.formatNotes(x["Notes"]), Working_Date: x["Working_Date"], Day: this.days_Names[day], New_Date: x["new_date"], New_Day: this.findNewDay(x),
+            Notes: this.formatNotes(x["Notes"]), Working_Date: x["Working_Date"], Day: this.days_Names[day], New_Date: x["new_date"], New_Day: this.findNewDay(x), CoNM_initials: x['ConM_initials'], CoMM_initials: x['CoMM_initials'], Opened_By: x['ConM_initials1'], Reject_Reason: x['reject_reason'], Cancel_Reason: x['cancel_reason']
           }
         )
       });
@@ -740,11 +741,11 @@ isValidDate(date: any): boolean {
 
   return notesArr
     .map(noteObj => {
-      const username = noteObj.username || ""; // adjust field name
-      const note = noteObj.note || "";      // adjust field name
+      const username = noteObj.username || "";
+      const note = noteObj.note || ""; 
       return `${username}: ${note}`;
     })
-    .join("; "); // separate entries with ;
+    .join("; ");
 }
   
   nightShiftCheck(rows) {
@@ -757,7 +758,7 @@ isValidDate(date: any): boolean {
       let newDayIndex = newDate.getDay();
       return this.days_Names[newDayIndex];
     }
-    return ""; // Return empty string if new_date is invalid
+    return "";
   }
   
   printHRAS(tableData) {

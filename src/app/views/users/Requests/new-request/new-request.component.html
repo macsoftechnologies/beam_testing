@@ -855,11 +855,12 @@ Add Files
         <!-- Search box (non-selectable) -->
 <mat-option class="search-option" disabled>
   <input
-    type="text"
-    placeholder="Search..."
-    (keyup)="onElectricalSearch($event.target.value)"
-    class="mat-select-search-input"
-  />
+  type="text"
+  placeholder="Search..."
+  (keyup)="onElectricalSearch($event.target.value)"
+  (keydown)="$event.stopPropagation()"
+  class="mat-select-search-input"
+/>
 </mat-option>
 
 
@@ -881,11 +882,12 @@ Add Files
           <!-- Search box (non-selectable) -->
 <mat-option class="search-option" disabled>
   <input
-    type="text"
-    placeholder="Search..."
-    (keyup)="onMechanicalSearch($event.target.value)"
-    class="mat-select-search-input"
-  />
+  type="text"
+  placeholder="Search..."
+  (keyup)="onMechanicalSearch($event.target.value)"
+  (keydown)="$event.stopPropagation()"
+  class="mat-select-search-input"
+/>
 </mat-option>
 
 
