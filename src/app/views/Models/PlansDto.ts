@@ -20,6 +20,6 @@ export class PlansDto
     new_date: string;
     new_end_time: string;
     permit_under: string;
-    hras: '';
+    hras: string;
     Request_status: string;
 }

@@ -401,7 +401,9 @@ export class ListRequestComponent implements OnInit {
     permit_under: '',
     night_shift: '',
     new_date: "",
-    new_end_time: ""
+    new_end_time: "",
+    start_time: "",
+    end_time: ""
   };
 
   RequestsbyidDto: RequestBySubcontractorId = {
@@ -416,7 +418,7 @@ export class ListRequestComponent implements OnInit {
   filteredFloors: string[] = [];
   filteredRooms: RoomGroup[] = [];
   isnightshiftyes: boolean = false;
-  gridCols5: number = 5;
+  gridCols3: number = 3;
   
   private allRooms: RoomGroup[] = [];
   private allFloors: { buildingId: number; floorName: string }[] = [];
@@ -481,16 +483,16 @@ this.breakpointObserver.observe([
 ]).subscribe(result => {
   if (result.breakpoints[Breakpoints.XSmall]) {
     this.gridCols = 1;
-    this.gridCols5 = 1;
+    this.gridCols3 = 1;
   } else if (result.breakpoints[Breakpoints.Small]) {
     this.gridCols = 2;
-    this.gridCols5 = 2;
+    this.gridCols3 = 2;
   } else if (result.breakpoints[Breakpoints.Medium]) {
     this.gridCols = 2;
-    this.gridCols5 = 3;
+    this.gridCols3 = 3;
   } else if (result.breakpoints[Breakpoints.Large]) {
     this.gridCols = 2;
-    this.gridCols5 = 5;
+    this.gridCols3 = 3;
   }
 });
 
@@ -770,7 +772,7 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
     this.RequestlistForm.get('night_shift').setValue(isChecked ? 1 : 0);
   
     const newEndTimeControl = this.RequestlistForm.get('new_end_time');
-    const newWorkDateControl = this.RequestlistForm.get('newWorkDate');
+    // const newWorkDateControl = this.RequestlistForm.get('newWorkDate');
   
     if (isChecked) {
       const startDateValue = this.RequestlistForm.get('Startdate').value;
@@ -779,22 +781,22 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
         const newWorkDate = new Date(startDate);
         newWorkDate.setDate(startDate.getDate() + 1);
         const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
-        newWorkDateControl.setValue(formattedDate);
+        // newWorkDateControl.setValue(formattedDate);
       }
       // Add required validators when night shift is YES
       newEndTimeControl.setValidators([Validators.required]);
-      newWorkDateControl.setValidators([Validators.required]);
+      // newWorkDateControl.setValidators([Validators.required]);
     } else {
       // Clear values and validators when night shift is NO
       newEndTimeControl.reset();
-      newWorkDateControl.reset();
+      // newWorkDateControl.reset();
       newEndTimeControl.clearValidators();
-      newWorkDateControl.clearValidators();
+      // newWorkDateControl.clearValidators();
     }
   
     // Re-evaluate validity after validator change
     newEndTimeControl.updateValueAndValidity();
-    newWorkDateControl.updateValueAndValidity();
+    // newWorkDateControl.updateValueAndValidity();
   }
 
   getItems() {
@@ -964,6 +966,12 @@ this.SearchRequest.Request_status = formattedStatus || "";
       this.RequestlistForm.controls['WorkingDateTo'].value,
       'yyyy-MM-dd'
     );
+    var newDate = this.datePipe.transform(
+      this.RequestlistForm.controls['newWorkDate'].value,
+      'yyyy-MM-dd'
+    );
+    this.SearchRequest.new_end_time =
+      this.RequestlistForm.controls['new_end_time'].value.toString();
     this.SearchRequest.Type_Of_Activity_Id =
       this.RequestlistForm.controls['TypeOfActivity'].value.toString();
     // this.SearchRequest.Room_Type = this.RequestlistForm.controls['Level'].value.toString();
@@ -988,6 +996,13 @@ const formattedArea = areasArray
 this.SearchRequest.area = formattedArea || ""; 
 this.SearchRequest.permit_type =
       this.RequestlistForm.controls['permit_type'].value.toString();
+      this.SearchRequest.permit_under =
+      this.RequestlistForm.controls['permit_under'].value.toString();
+      this.SearchRequest.night_shift =
+      this.RequestlistForm.controls['night_shift'].value.toString();
+
+        this.SearchRequest.start_time = this.RequestlistForm.controls["StartTime"].value || "";
+  this.SearchRequest.end_time = this.RequestlistForm.controls["EndTime"].value || "";
 
 //     const levelsArray = this.RequestlistForm.controls['Level'].value;
 // this.SearchRequest.Room_Type = levelsArray.map((val: string) => `'${val}'`).join(',');
@@ -1006,6 +1021,12 @@ this.SearchRequest.permit_type =
     } 
     else {
       this.SearchRequest.toDate = '';
+    }
+    if (newDate != null) {
+      this.SearchRequest.new_date = newDate;
+    } 
+    else {
+      this.SearchRequest.new_date = '';
     }
     if(this.RequestlistForm.get("Hras").value.includes('none')) {
       this.SearchRequest.hras = 'none';
@@ -1311,7 +1332,9 @@ this.SearchRequest.permit_type =
       permit_under: '',
       night_shift: '',
       new_date: '',
-      new_end_time: ''
+      new_end_time: '',
+      start_time: '',
+      end_time: ''
     };
 
     this.requestservice.SearchRequest(searchCheckRequest).subscribe((res) => {
@@ -1695,7 +1718,9 @@ proceedWithStatusChange(row) {
             permit_under: '',
             night_shift: '',
             new_date: '',
-            new_end_time: ''
+            new_end_time: '',
+            start_time: '',
+            end_time: ''
         };
 
         return this.requestservice.SearchRequest(searchCheckRequest).pipe(

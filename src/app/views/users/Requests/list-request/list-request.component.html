@@ -97,7 +97,7 @@
           </mat-form-field>
         </mat-grid-tile>
       </mat-grid-list>
-      <mat-grid-list [cols]="gridCols5" rowHeight="80px">
+      <mat-grid-list [cols]="gridCols3" rowHeight="80px">
                     <mat-grid-tile>
                         <mat-form-field class="full-width" appearance="outline">
                             <mat-label>Start Time</mat-label>
@@ -132,18 +132,15 @@
               </mat-error>
             </mat-grid-tile>
 
-            <mat-grid-tile *ngIf="isnightshiftyes" class="night-shift-fields" [disabled]="isnightshiftyes">
+            <!-- <mat-grid-tile *ngIf="isnightshiftyes" class="night-shift-fields" [disabled]="isnightshiftyes">
               <mat-form-field class="datepikr full-width" appearance="outline">
-                <mat-label>New Date</mat-label>
-                <input matInput [min]="minDate" [disabled]="isnightshiftyes" formControlName="newWorkDate" [max]="maxDate" [matDatepicker]="spicker"
-                  [class.is-invalid]="RequestlistForm.get('newWorkDate').invalid && RequestlistForm.get('newWorkDate').touched" />
-                <mat-datepicker-toggle matSuffix [for]="spicker"></mat-datepicker-toggle>
-                <mat-datepicker #spicker></mat-datepicker>
-                <mat-error class="error-message"
-                  *ngIf="RequestlistForm.get('newWorkDate').invalid && RequestlistForm.get('newWorkDate').touched">Please select the
-                  New Date</mat-error>
-              </mat-form-field>
-            </mat-grid-tile>
+            <mat-label>New Date</mat-label>
+            <input matInput [min]="minDate" formControlName="newWorkDate" [max]="maxDate"
+              [matDatepicker]="tspicker" />
+            <mat-datepicker-toggle matSuffix [for]="tspicker"></mat-datepicker-toggle>
+            <mat-datepicker #tspicker></mat-datepicker>
+          </mat-form-field>
+            </mat-grid-tile> -->
 
             <!-- <mat-grid-tile *ngIf="isnightshiftyes" class="night-shift-fields">
               <mat-form-field class="full-width" appearance="outline">
@@ -159,14 +156,14 @@
               </mat-form-field>
               
             </mat-grid-tile> -->
-            <mat-grid-tile *ngIf="isnightshiftyes" class="night-shift-fields">
+            <!-- <mat-grid-tile *ngIf="isnightshiftyes" class="night-shift-fields">
   <mat-form-field class="full-width" appearance="outline">
     <mat-label>New End Time</mat-label>
     <input matInput [ngxTimepicker]="newEndTimePicker" [format]="24" 
       placeholder="New End Time" formControlName="new_end_time" />
     <ngx-material-timepicker #newEndTimePicker [minutesGap]="5"></ngx-material-timepicker>
   </mat-form-field>
-</mat-grid-tile>
+</mat-grid-tile> -->
 
                 </mat-grid-list>
 

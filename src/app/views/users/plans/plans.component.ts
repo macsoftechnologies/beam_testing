@@ -246,7 +246,7 @@ export class PlansComponent implements OnInit {
     new_date: null,
     new_end_time: null,
     permit_under: null,
-    hras: '',
+    hras: '' as string,
     Request_status: null,
   }
   Planslist: any[] = [];
@@ -263,7 +263,7 @@ export class PlansComponent implements OnInit {
   private allRooms: RoomGroup[] = [];
   private allFloors: { buildingId: number; floorName: string }[] = [];
   gridCols = 2;
-  gridCols5: number = 5;
+  gridCols3: number = 3;
   isnightshiftyes: boolean = false;
 
   constructor(private fb: FormBuilder, private userservices: UserService,
@@ -305,16 +305,16 @@ export class PlansComponent implements OnInit {
    ]).subscribe(result => {
      if (result.breakpoints[Breakpoints.XSmall]) {
        this.gridCols = 1;
-       this.gridCols5 = 1;
+       this.gridCols3 = 1;
      } else if (result.breakpoints[Breakpoints.Small]) {
        this.gridCols = 2;
-       this.gridCols5 = 2;
+       this.gridCols3 = 2;
      } else if (result.breakpoints[Breakpoints.Medium]) {
        this.gridCols = 2;
-       this.gridCols5 = 3;
+       this.gridCols3 = 3;
      } else if (result.breakpoints[Breakpoints.Large]) {
        this.gridCols = 2;
-       this.gridCols5 = 5;
+       this.gridCols3 = 3;
      }
    });
     this.PlanForm = this.fb.group({
@@ -337,6 +337,8 @@ export class PlansComponent implements OnInit {
       night_shift: ['',],
       newWorkDate: ['',],
       new_end_time: ['',],
+      Hras: ['',],
+       Status: ['',],
     });
 
     this.initializeData();
@@ -649,12 +651,38 @@ Getplans() {
   // ✅ From / To Dates
   const fromDateValue = this.PlanForm.controls["WorkingDateFrom"].value;
   const toDateValue = this.PlanForm.controls["WorkingDateTo"].value;
+  const newWorkDateValue = this.PlanForm.controls["newWorkDate"].value
   this.plansDtodata.from_date = fromDateValue ? this.datePipe.transform(fromDateValue, 'yyyy-MM-dd') : "";
   this.plansDtodata.to_date = toDateValue ? this.datePipe.transform(toDateValue, 'yyyy-MM-dd') : "";
+  this.plansDtodata.new_date = newWorkDateValue ? this.datePipe.transform(newWorkDateValue, 'yyyy-MM-dd') : "";
 
   // ✅ Start/End Time
   this.plansDtodata.start_time = this.PlanForm.controls["StartTime"].value || "";
   this.plansDtodata.end_time = this.PlanForm.controls["EndTime"].value || "";
+  this.plansDtodata.new_end_time = this.PlanForm.controls["new_end_time"].value || "";
+  this.plansDtodata.night_shift = this.PlanForm.controls["night_shift"].value || "";
+  this.plansDtodata.permit_under = this.PlanForm.controls["permit_under"].value || "";
+  const statusValue = this.PlanForm.controls['Status'].value;
+  const statusArray = Array.isArray(statusValue) ? statusValue : [statusValue]; 
+  
+  const formattedStatus = statusArray
+    .filter(val => val !== null && val !== undefined && val !== '') 
+    .map((val: string) => `'${val}'`)
+    .join(',');
+  
+  this.plansDtodata.Request_status = formattedStatus || ""; 
+  if(this.PlanForm.get("Hras").value.includes('none')) {
+      this.plansDtodata.hras = 'none';
+    }
+     else {
+      this.plansDtodata.hras = '';
+    }
+    if (this.PlanForm.get("Hras").value.length > 0 && !this.PlanForm.get("Hras").value.includes('none')){
+      this.PlanForm.get("Hras").value.forEach(item =>{
+
+        this.plansDtodata[item.key] = item.value.toString()
+      })
+    }
 
   // ✅ Area (multiple → "A|B|C")
   const areaValue = this.PlanForm.controls['area'].value || [];
