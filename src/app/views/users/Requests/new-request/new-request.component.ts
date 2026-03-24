@@ -4520,15 +4520,15 @@ private logFieldChanges(previousData: any, currentData: any): any[] {
 
     // pressurization power on fields
     this.updaterequestdata.power_on = this.RequestForm.controls["Poweron"].value;
-    this.Requestdata.energising_equipment = this.RequestForm.controls["EnergisingEquipment"].value || 0;
-    this.Requestdata.isolating_live = this.RequestForm.controls["IsolatingLive"].value || 0;
-    this.Requestdata.working_near_live = this.RequestForm.controls["WorkingNearLive"].value || 0;
+    this.updaterequestdata.energising_equipment = this.RequestForm.controls["EnergisingEquipment"].value || 0;
+    this.updaterequestdata.isolating_live = this.RequestForm.controls["IsolatingLive"].value || 0;
+    this.updaterequestdata.working_near_live = this.RequestForm.controls["WorkingNearLive"].value || 0;
              
     //  pressurization Energising Equipment fields
     this.updaterequestdata.responsible_for_the_area = this.RequestForm.controls["floatLabel88"].value;
     this.updaterequestdata.risk_assessment_done = this.RequestForm.controls["floatLabel89"].value;
     this.updaterequestdata.barriers_signage = this.RequestForm.controls["floatLabel90"].value;
-    this.Requestdata.arc_flash = this.RequestForm.controls["floatLabel110"].value || 0;
+    this.updaterequestdata.arc_flash = this.RequestForm.controls["floatLabel110"].value || 0;
     this.updaterequestdata.energized_been_tested = this.RequestForm.controls["floatLabel91"].value;
     this.updaterequestdata.punches_been_closed = this.RequestForm.controls["floatLabel92"].value;
     this.updaterequestdata.toct_checklist = this.RequestForm.controls["floatLabel93"].value;
@@ -6057,12 +6057,12 @@ this.RequestForm.controls["mechanical_works"].setValue(mechanicalIds);
     this.RequestForm.controls["hot_work_checklist_filled"].setValue(this.data.payload?.["hot_work_checklist_filled"] || "");
     this.RequestForm.controls["fire_guard_present"].setValue(this.data.payload?.["fire_guard_present"] || "");
     
-    this.RequestForm.controls["EnergisingEquipment"].setValue(this.data.payload?.["energising_equipment"] || '0');
-    this.RequestForm.controls["IsolatingLive"].setValue(this.data.payload?.["isolating_live"] || '0');
-    this.RequestForm.controls["WorkingNearLive"].setValue(this.data.payload?.["working_near_live"] || '0');
+    this.RequestForm.controls["EnergisingEquipment"].setValue(parseInt(data["energising_equipment"] || '0'));
+    this.RequestForm.controls["IsolatingLive"].setValue(parseInt(data["isolating_live"] || '0'));
+    this.RequestForm.controls["WorkingNearLive"].setValue(parseInt(data["working_near_live"] || '0'));
     
     // Handle all the other floatLabel controls
-    for (let i = 1; i <= 109; i++) {
+    for (let i = 1; i <= 127; i++) {
         const controlName = `floatLabel${i}`;
         if (this.RequestForm.controls[controlName]) {
             this.RequestForm.controls[controlName].setValue(parseInt(data[this.getFloatLabelFieldName(i)] || '0'));
