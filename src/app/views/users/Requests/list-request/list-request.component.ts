@@ -769,33 +769,33 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
 
       toggleNightShift(isChecked: boolean) {
     this.isnightshiftyes = isChecked;
-    this.RequestlistForm.get('night_shift').setValue(isChecked ? 1 : 0);
+    this.RequestlistForm.get('night_shift').setValue(isChecked ? 1 : '');
   
     const newEndTimeControl = this.RequestlistForm.get('new_end_time');
     // const newWorkDateControl = this.RequestlistForm.get('newWorkDate');
   
-    if (isChecked) {
-      const startDateValue = this.RequestlistForm.get('Startdate').value;
-      if (startDateValue) {
-        const startDate = new Date(startDateValue);
-        const newWorkDate = new Date(startDate);
-        newWorkDate.setDate(startDate.getDate() + 1);
-        const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
-        // newWorkDateControl.setValue(formattedDate);
-      }
-      // Add required validators when night shift is YES
-      newEndTimeControl.setValidators([Validators.required]);
-      // newWorkDateControl.setValidators([Validators.required]);
-    } else {
-      // Clear values and validators when night shift is NO
-      newEndTimeControl.reset();
-      // newWorkDateControl.reset();
-      newEndTimeControl.clearValidators();
-      // newWorkDateControl.clearValidators();
-    }
+    // if (isChecked) {
+    //   const startDateValue = this.RequestlistForm.get('Startdate').value;
+    //   if (startDateValue) {
+    //     const startDate = new Date(startDateValue);
+    //     const newWorkDate = new Date(startDate);
+    //     newWorkDate.setDate(startDate.getDate() + 1);
+    //     const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
+    //     // newWorkDateControl.setValue(formattedDate);
+    //   }
+    //   // Add required validators when night shift is YES
+    //   newEndTimeControl.setValidators([Validators.required]);
+    //   // newWorkDateControl.setValidators([Validators.required]);
+    // } else {
+    //   // Clear values and validators when night shift is NO
+    //   newEndTimeControl.reset();
+    //   // newWorkDateControl.reset();
+    //   newEndTimeControl.clearValidators();
+    //   // newWorkDateControl.clearValidators();
+    // }
   
-    // Re-evaluate validity after validator change
-    newEndTimeControl.updateValueAndValidity();
+    // // Re-evaluate validity after validator change
+    // newEndTimeControl.updateValueAndValidity();
     // newWorkDateControl.updateValueAndValidity();
   }
 

@@ -223,7 +223,29 @@ export class StatusChangeDialogComponent implements OnInit {
     low_risk_hotwork: null,
     high_risk_hotwork: null,
     hot_work_checklist_filled: null,
-    fire_guard_present:null
+    fire_guard_present:null,
+
+    energising_equipment: null,
+    arc_flash:null,
+    isolating_live: null,
+    isolating_resposible: null,
+    isolating_risk_assessment: null,
+    cq_informed: null,
+    cq_provided: null,
+    de_energisation_request: null,
+    ppe_prepared: null,
+    absence_of_voltage: null,
+    stored_energy: null,
+    backup_power: null,
+    working_near_live: null,
+    unavoidable: null,
+    reasonably_practicable: null,
+    work_authorised: null,
+    working_risk_assessment: null,
+    working_arc_boundary: null,
+    working_barriers: null,
+    insulated_tools: null,
+    event_of_emergency: null,
   };
   images: any[] = [];
   base64Images: any[] = [];
@@ -530,13 +552,38 @@ export class StatusChangeDialogComponent implements OnInit {
     this.updaterequestdata.safety_valves_calibrated =  this.data["payload"]["safety_valves_calibrated"];
     // pressurisation power on fields for commission
     this.updaterequestdata.power_on =  this.data["payload"]["power_on"];
+    this.updaterequestdata.energising_equipment = this.data.payload?.["energising_equipment"];
+    this.updaterequestdata.isolating_live = this.data.payload?.["isolating_live"];
+    this.updaterequestdata.working_near_live = this.data.payload?.["working_near_live"];
     this.updaterequestdata.responsible_for_the_area =  this.data["payload"]["responsible_for_the_area"];
     this.updaterequestdata.risk_assessment_done =  this.data["payload"]["risk_assessment_done"];
     this.updaterequestdata.barriers_signage =  this.data["payload"]["barriers_signage"];
+    this.updaterequestdata.arc_flash =  this.data["payload"]["arc_flash"];
     this.updaterequestdata.energized_been_tested =  this.data["payload"]["energized_been_tested"];
     this.updaterequestdata.punches_been_closed =  this.data["payload"]["punches_been_closed"];
     this.updaterequestdata.toct_checklist =  this.data["payload"]["toct_checklist"];
     this.updaterequestdata.informed_aligned =  this.data["payload"]["informed_aligned"];
+
+    this.updaterequestdata.isolating_resposible =  this.data["payload"]["isolating_resposible"];
+    this.updaterequestdata.isolating_risk_assessment =  this.data["payload"]["isolating_risk_assessment"];
+    this.updaterequestdata.cq_informed =  this.data["payload"]["cq_informed"];
+    this.updaterequestdata.cq_provided =  this.data["payload"]["cq_provided"];
+    this.updaterequestdata.de_energisation_request =  this.data["payload"]["de_energisation_request"];
+    this.updaterequestdata.ppe_prepared =  this.data["payload"]["ppe_prepared"];
+    this.updaterequestdata.absence_of_voltage =  this.data["payload"]["absence_of_voltage"];
+    this.updaterequestdata.stored_energy =  this.data["payload"]["stored_energy"];
+    this.updaterequestdata.backup_power =  this.data["payload"]["backup_power"];
+
+    this.updaterequestdata.unavoidable =  this.data["payload"]["unavoidable"];
+    this.updaterequestdata.reasonably_practicable =  this.data["payload"]["reasonably_practicable"];
+    this.updaterequestdata.work_authorised =  this.data["payload"]["work_authorised"];
+    this.updaterequestdata.working_risk_assessment =  this.data["payload"]["working_risk_assessment"];
+    this.updaterequestdata.working_arc_boundary =  this.data["payload"]["working_arc_boundary"];
+    this.updaterequestdata.working_barriers =  this.data["payload"]["working_barriers"];
+    this.updaterequestdata.insulated_tools =  this.data["payload"]["insulated_tools"];
+    this.updaterequestdata.event_of_emergency =  this.data["payload"]["event_of_emergency"];
+    
+
     // pressurisation fields for commission
     this.updaterequestdata.pressurization =  this.data["payload"]["pressurization"];
     this.updaterequestdata.performed_approved =  this.data["payload"]["performed_approved"];

@@ -450,32 +450,32 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
       this.isnightshiftyes = isChecked;
       this.PlanForm.get('night_shift').setValue(isChecked ? 1 : 0);
     
-      const newEndTimeControl = this.PlanForm.get('new_end_time');
-      const newWorkDateControl = this.PlanForm.get('newWorkDate');
+      // const newEndTimeControl = this.PlanForm.get('new_end_time');
+      // const newWorkDateControl = this.PlanForm.get('newWorkDate');
     
-      if (isChecked) {
-        const startDateValue = this.PlanForm.get('Startdate').value;
-        if (startDateValue) {
-          const startDate = new Date(startDateValue);
-          const newWorkDate = new Date(startDate);
-          newWorkDate.setDate(startDate.getDate() + 1);
-          const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
-          newWorkDateControl.setValue(formattedDate);
-        }
-        // Add required validators when night shift is YES
-        newEndTimeControl.setValidators([Validators.required]);
-        newWorkDateControl.setValidators([Validators.required]);
-      } else {
-        // Clear values and validators when night shift is NO
-        newEndTimeControl.reset();
-        newWorkDateControl.reset();
-        newEndTimeControl.clearValidators();
-        newWorkDateControl.clearValidators();
-      }
+      // if (isChecked) {
+      //   const startDateValue = this.PlanForm.get('Startdate').value;
+      //   if (startDateValue) {
+      //     const startDate = new Date(startDateValue);
+      //     const newWorkDate = new Date(startDate);
+      //     newWorkDate.setDate(startDate.getDate() + 1);
+      //     const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
+      //     newWorkDateControl.setValue(formattedDate);
+      //   }
+      //   // Add required validators when night shift is YES
+      //   newEndTimeControl.setValidators([Validators.required]);
+      //   newWorkDateControl.setValidators([Validators.required]);
+      // } else {
+      //   // Clear values and validators when night shift is NO
+      //   newEndTimeControl.reset();
+      //   newWorkDateControl.reset();
+      //   newEndTimeControl.clearValidators();
+      //   newWorkDateControl.clearValidators();
+      // }
     
       // Re-evaluate validity after validator change
-      newEndTimeControl.updateValueAndValidity();
-      newWorkDateControl.updateValueAndValidity();
+      // newEndTimeControl.updateValueAndValidity();
+      // newWorkDateControl.updateValueAndValidity();
     }
 
   Getselectedyear(event) {
@@ -670,12 +670,23 @@ Getplans() {
     .map((val: string) => `'${val}'`)
     .join(',');
   
-  this.plansDtodata.Request_status = formattedStatus || ""; 
+  this.plansDtodata.Request_status = formattedStatus || "";
+  if(this.PlanForm.get("Hras") == null) {
+    this.plansDtodata.hras = '';
+  }
   if(this.PlanForm.get("Hras").value.includes('none')) {
       this.plansDtodata.hras = 'none';
+
+      this.getHras.forEach(hras => {
+    this.plansDtodata[hras.key] = "0";
+  });
     }
      else {
       this.plansDtodata.hras = '';
+
+      this.getHras.forEach(hras => {
+    this.plansDtodata[hras.key] = "0";
+  });
     }
     if (this.PlanForm.get("Hras").value.length > 0 && !this.PlanForm.get("Hras").value.includes('none')){
       this.PlanForm.get("Hras").value.forEach(item =>{
@@ -683,6 +694,12 @@ Getplans() {
         this.plansDtodata[item.key] = item.value.toString()
       })
     }
+
+    this.getHras.forEach(hras => {
+  if (this.plansDtodata[hras.key] == "0") {
+    delete this.plansDtodata[hras.key];
+  }
+});
 
   // ✅ Area (multiple → "A|B|C")
   const areaValue = this.PlanForm.controls['area'].value || [];
