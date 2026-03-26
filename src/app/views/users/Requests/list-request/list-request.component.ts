@@ -402,8 +402,8 @@ export class ListRequestComponent implements OnInit {
     night_shift: '',
     new_date: "",
     new_end_time: "",
-    start_time: "",
-    end_time: ""
+    Start_Time: "",
+    End_Time: ""
   };
 
   RequestsbyidDto: RequestBySubcontractorId = {
@@ -1001,8 +1001,8 @@ this.SearchRequest.permit_type =
       this.SearchRequest.night_shift =
       this.RequestlistForm.controls['night_shift'].value.toString();
 
-        this.SearchRequest.start_time = this.RequestlistForm.controls["StartTime"].value || "";
-  this.SearchRequest.end_time = this.RequestlistForm.controls["EndTime"].value || "";
+        this.SearchRequest.Start_Time = this.RequestlistForm.controls["StartTime"].value || "";
+  this.SearchRequest.End_Time = this.RequestlistForm.controls["EndTime"].value || "";
 
 //     const levelsArray = this.RequestlistForm.controls['Level'].value;
 // this.SearchRequest.Room_Type = levelsArray.map((val: string) => `'${val}'`).join(',');
@@ -1333,8 +1333,8 @@ this.SearchRequest.permit_type =
       night_shift: '',
       new_date: '',
       new_end_time: '',
-      start_time: '',
-      end_time: ''
+      Start_Time: '',
+      End_Time: ''
     };
 
     this.requestservice.SearchRequest(searchCheckRequest).subscribe((res) => {
@@ -1719,8 +1719,8 @@ proceedWithStatusChange(row) {
             night_shift: '',
             new_date: '',
             new_end_time: '',
-            start_time: '',
-            end_time: ''
+            Start_Time: '',
+            End_Time: ''
         };
 
         return this.requestservice.SearchRequest(searchCheckRequest).pipe(

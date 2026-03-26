@@ -21,8 +21,8 @@ export class SearchRequestDto
     night_shift: string;
     new_date: string;
     new_end_time: string;
-    start_time: string;
-    end_time: string;
+    Start_Time: string;
+    End_Time: string;
 }
 
 export class ListRequest
