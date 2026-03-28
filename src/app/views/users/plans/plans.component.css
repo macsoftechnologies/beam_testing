@@ -37,6 +37,20 @@
     display: flex!important;
     align-items: center!important;
 }
+
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
 /* .download_btn_sty
 {
   float: right;

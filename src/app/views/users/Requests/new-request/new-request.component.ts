@@ -2279,10 +2279,14 @@ private groupByModule(data: any[], displayProperty: string): any[] {
       const formattedDate = this.formatDateWithoutTimezone(newWorkDate);
       newWorkDateControl.setValue(formattedDate);
     }
+    this.RequestForm.get('EndTime').setValue('23:55');
+    this.RequestForm.get('EndTime').disable();
     // Add required validators when night shift is YES
     newEndTimeControl.setValidators([Validators.required]);
     newWorkDateControl.setValidators([Validators.required]);
   } else {
+    this.RequestForm.get('EndTime').setValue(null);
+    this.RequestForm.get('EndTime').enable();
     // Clear values and validators when night shift is NO
     newEndTimeControl.reset();
     newWorkDateControl.reset();

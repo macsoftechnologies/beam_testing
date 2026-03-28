@@ -385,3 +385,7 @@
         </ngx-datatable>
     </mat-card-content>
 </mat-card>
+
+<div class="loading-indicator" *ngIf="spinner">
+  <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+</div>

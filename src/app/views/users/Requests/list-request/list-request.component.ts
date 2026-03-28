@@ -4,6 +4,7 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  HostListener,
 } from '@angular/core';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 
@@ -1171,6 +1172,24 @@ this.SearchRequest.permit_type =
     document.body.appendChild(link);
     link.click();
   }
+
+@HostListener('document:keydown.enter', ['$event'])
+onEnterSearch(event: KeyboardEvent) {
+  const activeElement = document.activeElement;
+  
+  // Check if any mat-select panel is open - if so, don't trigger search
+  const isDropdownOpen = document.querySelector('.mat-select-panel');
+  
+  if (isDropdownOpen) {
+    return; // let the dropdown handle the enter key
+  }
+
+  // Only trigger if the filter tab is visible (form is open)
+  if (this.Filtertab !== undefined) {
+    event.preventDefault();
+    this.search({ page: this.currentPage });
+  }
+}
 
   Editrow(row) {
     this.requestservice.SelectedRequestData = {

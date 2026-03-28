@@ -511,10 +511,15 @@
             ">
             {{ row?.Request_status }}
           </mat-chip>
-          <mat-chip [ngClass]="{ 'status_cancelled': row?.Request_status == 'Cancelled'}" mat-sm-chip [color]="'primary'"
+          <!-- <mat-chip [ngClass]="{ 'status_cancelled': row?.Request_status == 'Cancelled'}" mat-sm-chip [color]="'primary'"
             *ngIf="row.Request_status == 'Cancelled'">
             {{ row?.Request_status }}
-          </mat-chip>
+          </mat-chip> -->
+          <mat-chip [ngClass]="{ 'status_autocancelled': row?.Request_status == 'Cancelled' && row?.cancel_reason == 'Permit not opened so system cancelled automatically', 'status_cancelled': row?.Request_status == 'Cancelled' && row?.cancel_reason != 'Permit not opened so system cancelled automatically'}" 
+  mat-sm-chip [color]="'primary'"
+  *ngIf="row.Request_status == 'Cancelled'">
+  {{ row?.cancel_reason == 'Permit not opened so system cancelled automatically' ? 'Auto-Cancelled' : row?.Request_status }}
+</mat-chip>
           <mat-chip [ngClass]="{ 'status_rejected': row?.Request_status == 'Rejected'}" mat-sm-chip [color]="'primary'"
             *ngIf="row.Request_status == 'Rejected'">
             {{ row?.Request_status }}
@@ -571,10 +576,15 @@
             *ngIf="row.Request_status == 'Rejected'">
             {{ row?.Request_status }}
           </mat-chip>
-          <mat-chip [ngClass]="{ 'status_cancelled': row?.Request_status == 'Cancelled'}" mat-sm-chip [color]="'primary'"
+          <!-- <mat-chip [ngClass]="{ 'status_cancelled': row?.Request_status == 'Cancelled'}" mat-sm-chip [color]="'primary'"
             *ngIf="row.Request_status == 'Cancelled'">
             {{ row?.Request_status }}
-          </mat-chip>
+          </mat-chip> -->
+<mat-chip [ngClass]="{ 'status_autocancelled': row?.Request_status == 'Cancelled' && row?.cancel_reason == 'Permit not opened so system cancelled automatically', 'status_cancelled': row?.Request_status == 'Cancelled' && row?.cancel_reason != 'Permit not opened so system cancelled automatically'}" 
+  mat-sm-chip [color]="'primary'"
+  *ngIf="row.Request_status == 'Cancelled'">
+  {{ row?.cancel_reason == 'Permit not opened so system cancelled automatically' ? 'Auto-Cancelled' : row?.Request_status }}
+</mat-chip>
           <mat-chip [ngClass]="{ 'status_draft': row?.Request_status == 'Draft'}" mat-sm-chip [color]="'primary'"
             *ngIf="row.Request_status == 'Draft'">
             {{ row?.Request_status }}

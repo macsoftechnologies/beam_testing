@@ -649,20 +649,49 @@ setTimeout(() => {
         const activeTag = (document.activeElement as HTMLElement)?.tagName?.toUpperCase();
         if (activeTag === 'BUTTON' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
 
+        // Check if any mat-select panel is open
+        const isDropdownOpen = document.querySelector('.mat-select-panel');
+        if (isDropdownOpen) return;
+
         event.preventDefault();
         event.stopPropagation();
 
-        console.log('Enter pressed - type:', this.type, 'requestDatas:', this.requestDatas, 
-                    'permitType:', this.permitType, 'permitUnder:', this.permitUnder);
+        // ─── REJECT (negative action) ───
+        // Reject is available when type is 'operartor' regardless of permit type
+        if (this.type === 'operartor') {
+          const rejectReason = this.statusApprovedForm.get('reject_reason').value?.trim();
 
-        if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
-            this.permitType === 'Commissioning' && this.permitUnder === 'Construction') {
-          const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
-          console.log('CoMM_initials val:', val);
-          if (val) this.Changestatus('Pre-Approved');
+          // Check if reject_reason has value — means user intends to reject
+          if (rejectReason) {
+            this.Changestatus('Rejected');
+            return;
+          }
+        }
+
+        // ─── CANCEL (negative action when type is 'Opened') ───
+        if (this.type === 'Opened') {
+          const cancelReason = this.statusOpenForm.get('cancel_reason').value?.trim();
+          const initials = this.statusOpenForm.get('ConM_initials1').value?.trim();
+
+          // If cancel_reason is filled but initials not — means cancel intent
+          if (cancelReason && !initials) {
+            this.ChangestatusToOpen('Cancelled');
+            return;
+          }
+
+          // If both filled — still open (positive), handled below
+          if (initials) {
+            if (this.canOpen()) {
+              this.ChangestatusToOpen('Opened');
+            }
+            return;
+          }
           return;
         }
 
+        // ─── POSITIVE ACTIONS ───
+
+        // Pre-Approve: Construction permit, under Commissioning (CONM pre-approves)
         if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
             this.permitType === 'Construction' && this.permitUnder === 'Commissioning') {
           const val = this.statusApprovedForm.get('ConM_initials').value?.trim();
@@ -670,6 +699,15 @@ setTimeout(() => {
           return;
         }
 
+        // Pre-Approve: Commissioning permit, under Construction (COMM pre-approves)
+        if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
+            this.permitType === 'Commissioning' && this.permitUnder === 'Construction') {
+          const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
+          if (val) this.Changestatus('Pre-Approved');
+          return;
+        }
+
+        // Approve: Commissioning + Commissioning (single approval)
         if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
             this.permitType === 'Commissioning' && this.permitUnder === 'Commissioning') {
           const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
@@ -677,6 +715,7 @@ setTimeout(() => {
           return;
         }
 
+        // Approve: Construction + Commissioning (final approval by COMM)
         if (this.type === 'operartor' && this.requestDatas === 'Pre-Approved' &&
             this.permitType === 'Construction' && this.permitUnder === 'Commissioning') {
           const val = this.statusApprovedForm.get('CoMM_initials').value?.trim();
@@ -684,6 +723,7 @@ setTimeout(() => {
           return;
         }
 
+        // Approve: Construction + Construction (single approval)
         if (this.type === 'operartor' && this.requestDatas === 'Hold' &&
             this.permitType === 'Construction' && this.permitUnder === 'Construction') {
           const val = this.statusApprovedForm.get('ConM_initials').value?.trim();
@@ -691,6 +731,7 @@ setTimeout(() => {
           return;
         }
 
+        // Approve: Commissioning + Construction (final approval by CONM)
         if (this.type === 'operartor' && this.requestDatas === 'Pre-Approved' &&
             this.permitType === 'Commissioning' && this.permitUnder === 'Construction') {
           const val = this.statusApprovedForm.get('ConM_initials').value?.trim();
@@ -698,11 +739,7 @@ setTimeout(() => {
           return;
         }
 
-        if (this.type === 'Opened' && !this.isclose) {
-          if (this.canOpen()) this.ChangestatusToOpen('Opened');
-          return;
-        }
-
+        // Close
         if (this.type === 'Closed') {
           const closeNote = this.statusUpdateForm.get('close_note').value?.trim();
           const hotworkValid =

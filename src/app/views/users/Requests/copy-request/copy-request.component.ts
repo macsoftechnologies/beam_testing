@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostListener  } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from 'app/shared/services/user.service';
@@ -126,6 +126,24 @@ this.zones = data.zones || [];
     this.CopyRequest.zone = this.zones      
 
   }
+
+  @HostListener('document:keydown.enter', ['$event'])
+onEnterKey(event: KeyboardEvent) {
+  // Check if any mat-select panel or datepicker is open
+  const isDropdownOpen = document.querySelector('.mat-select-panel');
+  const isDatepickerOpen = document.querySelector('.mat-datepicker-content');
+  if (isDropdownOpen || isDatepickerOpen) return;
+
+  const activeTag = (document.activeElement as HTMLElement)?.tagName?.toUpperCase();
+  if (activeTag === 'BUTTON' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+
+  // Only proceed if both dates are filled and valid
+  if (!this.workingdateFrom || !this.workingdateTo) return;
+  if (this.workingdateTo < this.workingdateFrom) return;
+
+  event.preventDefault();
+  this.CreatenewRequest();
+}
 
   CreatenewRequest() {
     const oneDay = 24 * 60 * 60 * 1000;

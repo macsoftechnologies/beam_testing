@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener  } from '@angular/core';
 import {FormBuilder, FormGroup, Validators, } from '@angular/forms';
 import { UserService } from 'app/shared/services/user.service';
 import { Router } from '@angular/router';
@@ -46,7 +46,7 @@ interface RoomGroup {
 })
 export class PlansComponent implements OnInit {
   ModalOptions: PrintDownloadOptions;
-
+  spinner: boolean = false;
   PlanForm: FormGroup;
   minDate: Date;
   maxDate: Date;
@@ -478,6 +478,20 @@ private filterRooms(buildingIds: number[], levels: string[]): RoomGroup[] {
       // newWorkDateControl.updateValueAndValidity();
     }
 
+  @HostListener('document:keydown.enter', ['$event'])
+onEnterSearch(event: KeyboardEvent) {
+  // Check if any mat-select panel is open - if so, don't trigger search
+  const isDropdownOpen = document.querySelector('.mat-select-panel');
+  if (isDropdownOpen) return;
+
+  // Check if focus is on a button, textarea, or select - let those handle enter naturally
+  const activeTag = (document.activeElement as HTMLElement)?.tagName?.toUpperCase();
+  if (activeTag === 'BUTTON' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+
+  event.preventDefault();
+  this.Getplans();
+}
+
   Getselectedyear(event) {
     this.ListWeeks.length = 0;
     this.ListWeeks = [];
@@ -720,12 +734,15 @@ Getplans() {
     });
   }
   GetRequestData(searchreq) {
+    this.spinner = true;
     this.requstservice.GetPlans(this.plansDtodata).subscribe(res => {
       console.log(res, "search list");
+      this.spinner = false;
       if (Array.isArray(res)) {
     this.Planslist = res[0]["data"];
   } else {
     console.log("errorCase", res.message);
+    this.spinner = false;
     this.openSnackBar(`${res.message}`);
     this.Planslist = [];
   }
