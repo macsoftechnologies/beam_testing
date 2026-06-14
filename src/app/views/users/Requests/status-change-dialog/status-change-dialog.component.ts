@@ -401,6 +401,7 @@ export class StatusChangeDialogComponent implements OnInit {
     this.updaterequestdata.electrical_works = this.data["payload"]["electrical_works"];
     this.updaterequestdata.mechanical_works = this.data["payload"]["mechanical_works"];
     this.updaterequestdata.work_type = this.data["payload"]["work_type"];
+    this.updaterequestdata.zone = this.data["payload"]["zone"] || this.data["payload"]["zones"] || null;
 
     // new keys added
 
@@ -863,7 +864,20 @@ canOpen() {
         }
       }
       for (const [key, value] of Object.entries(this.updaterequestdata)) {
-        formData.append(key, value); // Ensure values are strings if needed
+        if (key !== 'zone' && value !== null && value !== undefined) {
+          formData.append(key, value as string); // Ensure values are strings if needed
+        }
+      }
+      const rawZone = this.updaterequestdata.zone;
+      if (rawZone !== null && rawZone !== undefined) {
+        if (Array.isArray(rawZone)) {
+          rawZone.forEach((z: string) => {
+            formData.append('zone[]', z);
+          });
+          formData.append('zone', JSON.stringify(rawZone));
+        } else {
+          formData.append('zone', rawZone as string);
+        }
       }
 
  this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
@@ -958,7 +972,20 @@ canOpen() {
         }
       }
       for (const [key, value] of Object.entries(this.updaterequestdata)) {
-        formData.append(key, value); // Ensure values are strings if needed
+        if (key !== 'zone' && value !== null && value !== undefined) {
+          formData.append(key, value as string); // Ensure values are strings if needed
+        }
+      }
+      const rawZone = this.updaterequestdata.zone;
+      if (rawZone !== null && rawZone !== undefined) {
+        if (Array.isArray(rawZone)) {
+          rawZone.forEach((z: string) => {
+            formData.append('zone[]', z);
+          });
+          formData.append('zone', JSON.stringify(rawZone));
+        } else {
+          formData.append('zone', rawZone as string);
+        }
       }
 
       this.requestdataservice.UpdateRequest(formData as unknown as EditRequestDto).subscribe(
@@ -1028,6 +1055,18 @@ canOpen() {
     formData.append("Request_status", this.Close_Request.Request_status);
     formData.append("userId", this.userdata["id"]);
     formData.append("createdTime", this.Close_Request.createdTime);
+    
+    const rawZone = this.updaterequestdata.zone;
+    if (rawZone !== null && rawZone !== undefined) {
+      if (Array.isArray(rawZone)) {
+        rawZone.forEach((z: string) => {
+          formData.append('zone[]', z);
+        });
+        formData.append('zone', JSON.stringify(rawZone));
+      } else {
+        formData.append('zone', rawZone as string);
+      }
+    }
     
     if (this.statusUpdateForm.valid && this.updaterequestdata.Hot_work == 1) {
       formData.append("h_heat_source", this.statusUpdateForm.value.h_heat_source);
@@ -1104,6 +1143,18 @@ canOpen() {
     formData.append("userId", this.userdata["id"]);
     formData.append("createdTime", this.Close_Request.createdTime);
     formData.append("close_note", this.statusUpdateForm.value.close_note);
+    
+    const rawZone = this.updaterequestdata.zone;
+    if (rawZone !== null && rawZone !== undefined) {
+      if (Array.isArray(rawZone)) {
+        rawZone.forEach((z: string) => {
+          formData.append('zone[]', z);
+        });
+        formData.append('zone', JSON.stringify(rawZone));
+      } else {
+        formData.append('zone', rawZone as string);
+      }
+    }
     
     if (this.statusUpdateForm.valid && this.updaterequestdata.Hot_work == 1) {
       formData.append("h_heat_source", this.statusUpdateForm.value.h_heat_source);

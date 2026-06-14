@@ -282,7 +282,7 @@ loadingZones: Set<string> = new Set();
           className: "M3-North-area-1-2",
           isSelected: false
         },{
-          value: 'Tent 12',
+          value: 'Tent 10',
           className: "M3-North-area-1-3",
           isSelected: false
         }
